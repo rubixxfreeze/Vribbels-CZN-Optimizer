@@ -5,20 +5,18 @@ Contains experience tables, equipment slots, stats, rarity, and other game-wide 
 
 from pathlib import Path
 
-# Experience thresholds for character levels (heroes)
-CHARACTER_EXP_TABLE = [
-    (0, 1), (100, 2), (500, 5), (2000, 10), (8000, 15),
-    (20000, 20), (40000, 25), (70000, 30), (100000, 35),
-    (144000, 40), (200000, 45), (300000, 50), (481000, 55), (720000, 60),
-]
+from ._gen_constants import (
+    CHARACTER_EXP_TABLE as _GEN_CHARACTER_EXP_TABLE,
+    PARTNER_EXP_TABLE as _GEN_PARTNER_EXP_TABLE,
+    SUBSTAT_ROLLS as _GEN_SUBSTAT_ROLLS,
+    SLOT_MAIN_STATS_KEYS as _GEN_SLOT_MAIN_STATS_KEYS,
+    MAIN_STAT_VALUES,
+)
 
-# Partner card exp table (different from heroes!)
-# Based on actual data: Daisy 36300=30, Alyssa 181000=50, Nyx 251000=55
-PARTNER_EXP_TABLE = [
-    (0, 1), (100, 2), (1000, 5), (4000, 10), (12000, 15),
-    (20000, 20), (28000, 25), (36300, 30), (70000, 35),
-    (110000, 40), (145000, 45), (181000, 50), (251000, 55), (360000, 60),
-]
+# Cumulative experience needed for each level, (total_exp, level), from char_growth@char_exp
+# (identical for every rarity). Characters currently go to 62, partner cards to 60.
+CHARACTER_EXP_TABLE = list(_GEN_CHARACTER_EXP_TABLE)
+PARTNER_EXP_TABLE = list(_GEN_PARTNER_EXP_TABLE)
 
 # Friendship bonus rewards (cumulative)
 FRIENDSHIP_BONUSES = [
@@ -69,7 +67,8 @@ RARITY_STARTING_SUBSTATS = {
     1: 0, 2: 1, 3: 2, 4: 3,
 }
 
-# Stat definitions with min/max roll values
+# Stat definitions with min/max roll values (substat roll ranges are overwritten below from
+# piece_option random_option legend values; elemental DMG% only exists as a slot V main stat)
 STATS = {
     "S_ATK_INC_ADD_OUT": ("Flat ATK", "Flat ATK", False, 8.0, 5.0),
     "S_ATK_INC_RATE_OUT": ("ATK%", "ATK%", True, 1.3, 0.8),
@@ -89,17 +88,18 @@ STATS = {
     "S_ORANGE_DMG_RATE_INC_ADD": ("Instinct DMG%", "Instinct", True, 3.5, 2.0),
 }
 
+for _key, (_max_roll, _min_roll) in _GEN_SUBSTAT_ROLLS.items():
+    if _key in STATS:
+        _name, _short, _pct, _, _ = STATS[_key]
+        STATS[_key] = (_name, _short, _pct, float(_max_roll), float(_min_roll))
+
 STAT_SHORT_NAMES = {info[0]: info[1] for info in STATS.values()}
 ALL_STAT_NAMES = [s[0] for s in STATS.values()]
 
-# Main stats for each slot (using updated names)
+# Main stats for each slot, from piece_option main_piece_<slot> (client order)
 SLOT_MAIN_STATS = {
-    1: ["Flat ATK"],
-    2: ["Flat DEF"],
-    3: ["Flat HP"],
-    4: ["ATK%", "DEF%", "HP%", "CRate", "CDmg"],
-    5: ["ATK%", "DEF%", "HP%", "Passion DMG%", "Order DMG%", "Justice DMG%", "Void DMG%", "Instinct DMG%"],
-    6: ["ATK%", "DEF%", "HP%", "Ego"],
+    slot: [STATS[key][0] for key in keys if key in STATS]
+    for slot, keys in _GEN_SLOT_MAIN_STATS_KEYS.items()
 }
 
 MAX_LEVEL = 5
@@ -147,21 +147,11 @@ def get_level_from_exp(exp: int, exp_table: list = None) -> int:
             return prev_level
         prev_exp, prev_level = min_exp, lvl
 
-    return 60  # Max level
+    return exp_table[-1][1]  # Max level
 
 
 def get_partner_level_from_exp(exp: int) -> int:
-    """Convert partner card experience to level.
-    Partners use a simpler linear formula at low levels: ~180 exp per level.
-    At higher levels, the exp requirement increases."""
-    if exp <= 0:
-        return 1
-
-    # For low exp (levels 1-10), use linear formula: 180 exp per level
-    if exp < 4000:
-        return min(60, max(1, exp // 180 + 1))
-
-    # For higher levels, use the exp table with interpolation
+    """Convert partner card experience to level (exact per-level table from the client)."""
     return get_level_from_exp(exp, PARTNER_EXP_TABLE)
 
 

@@ -356,6 +356,8 @@ class GearOptimizer:
                         hp_pct += value
                     elif stat == "Crit DMG":
                         crit_dmg += value
+                    elif stat == "Crit Rate":
+                        crit_rate += value
 
         total_atk = base_atk * (1 + atk_pct / 100) + flat_atk + friendship_atk + partner_atk
         total_def = base_def * (1 + def_pct / 100) + flat_def + friendship_def + partner_def
