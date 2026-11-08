@@ -216,12 +216,15 @@ class OptimizerTab(BaseTab):
 
         four_pc_inner = ttk.Frame(four_pc_frame)
         four_pc_inner.pack(fill=tk.X, padx=5)
+        # 16+ four-piece sets since game-data 1.8.0: 3 columns keeps long names
+        # ("Snowflake of Our First Meeting") inside the middle pane.
+        four_pc_cols = 3 if len(FOUR_PIECE_SETS) > 12 else 4
         for i, sid in enumerate(FOUR_PIECE_SETS):
             name = SETS[sid]["name"]
             var = tk.BooleanVar(value=False)
             self.four_piece_vars[name] = var
-            row = i // 4
-            col = i % 4
+            row = i // four_pc_cols
+            col = i % four_pc_cols
             ttk.Checkbutton(four_pc_inner, text=name, variable=var).grid(
                 row=row, column=col, sticky=tk.W, padx=5)
 
