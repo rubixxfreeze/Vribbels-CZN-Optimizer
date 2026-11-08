@@ -5,6 +5,44 @@ All notable changes to Vribbels CZN Optimizer will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.8.0] - 2026-11-08
+
+Game data is now generated from the current Global client tables (build 133) by
+`tools/build_game_data.py` instead of being entered by hand. Re-run with
+`python3 tools/build_game_data.py --dump <czn-data build dir>`; the hand-written helper
+functions are unchanged and import the generated `game_data/_gen_*.py` modules.
+
+### Added
+- **12 combatants**: Anika, Adelheid, Diana, Tenebria, Fei, Tiphera, Heidemarie, Rita,
+  Hilde, Arabella, Olga, Rossweisse (39 total, was 27)
+- **15 partner cards**: Ivy, Aria, Janet, Bria, Scarlet, Marianne, Sophia, Tiana, Ruixiang,
+  Sylvia, Clara, Eunie, Licinia, Emilie, Sig (50 total, was 35) - plus Tina under her real id
+- **6 Memory Fragment sets** (4-piece): Prelude to a Hero (26), Starlight and Dreams (27),
+  Battlefield Evolution (28), Sanguine Thorn (29), Veiled Radiance (30),
+  Snowflake of Our First Meeting (31) (22 total, was 16) - selectable in the Optimizer tab
+- Per-partner level-60 base stats (`base_stats`); the newer 5-star partner tier has
+  155 ATK / 144 HP (or 61 DEF / 144 HP) instead of the class-table 111/105
+- Exact per-level experience tables; combatant level cap 62
+- `tests/test_game_data.py` smoke tests (data schema + optimizer run, no GUI needed)
+
+### Fixed (client tables disagreed with the hand-entered data)
+- Level-60 base stats of 19 combatants (old values were +1 ATK / +70 HP too high, Selena and
+  Beryl also +5 DEF; combatants with identical table rows, e.g. Rin/Yuki, had different old values)
+- Potential node HP%/ATK% values: 1.6% per level (was 0.6%)
+- Orlea's attribute is Instinct (was Justice); Reona -> **Renoa**; Rosaria is a Ranger partner
+- Partner passive stat bonuses: the always-on ATK%/DEF%/HP% part is now included for every
+  partner (many had none) with current values (e.g. 5-star ATK% 16-24%, was 8-16%);
+  Solia's Extra DMG% bonus is now applied (key typo), Eishlen/Nyx get DEF%+HP%
+- Partner Ego skill names/costs/descriptions from the client (e.g. Westmacott cost 2,
+  Itsuku cost 3, Rachel "Hamburger Delivery, Sir!")
+- Tina is res_id 20038 in the client (20039 kept as an alias)
+- Slot IV / V main stats: the client offers no DEF% on IV or V, so it is no longer listed
+- `get_level_from_exp` no longer hard-caps at 60
+
+### Changed
+- Optimizer tab lays out 4-piece sets in 3 columns once there are more than 12
+- Stat-type set bonuses support Crit Rate
+
 ## [1.7.0] - 2026-02-07
 
 ### Added

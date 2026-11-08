@@ -70,6 +70,20 @@ Navigate to the **Materials** tab to see your growth stone inventory.
 Contributions are welcome! Feel free to:
 - Report bugs via GitHub Issues
 - Submit character/partner data updates
+
+### Game data
+
+Characters, partner cards, Memory Fragment sets, experience tables and substat/main-stat
+options live in `Vribbels/game_data/_gen_*.py`, generated from an extracted client table dump
+(`db/*.json` + `text/en/text.json`):
+
+```
+python3 tools/build_game_data.py --dump /path/to/czn-data/build-133
+python3 tools/build_game_data.py --dump ... --oracle /path/to/old/game_data --check   # diff only
+python3 -m unittest discover -s tests
+```
+
+Don't edit the generated files by hand - fix the generator instead.
 - Suggest new features
 - Improve documentation
 
@@ -78,6 +92,9 @@ Contributions are welcome! Feel free to:
 Inspired by [Fribbels Epic 7 Gear Optimizer](https://github.com/fribbels/Fribbels-Epic-7-Optimizer)
 
 Thanks to [EpicSevenAssetRipper](https://github.com/CeciliaBot/EpicSevenAssetRipper) for asset extraction tools
+
+Game data since 1.8.0 is generated from the Chaos Zero Nightmare Global client's own data tables
+(build 133) by `tools/build_game_data.py`.
 
 ## Support
 

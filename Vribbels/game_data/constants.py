@@ -18,7 +18,11 @@ from ._gen_constants import (
 CHARACTER_EXP_TABLE = list(_GEN_CHARACTER_EXP_TABLE)
 PARTNER_EXP_TABLE = list(_GEN_PARTNER_EXP_TABLE)
 
-# Friendship bonus rewards (cumulative)
+# Friendship bonus rewards (cumulative)  # TBD
+# NOT generated: combatant_friendship_bonus@friendship_bonus_no_bg gives +3 ATK / +1 DEF / +3 HP on a
+# 3-level cycle (HP +3, not +1, at level 4) and per-combatant groups replace some levels with items, but
+# it is unclear how the captured "friendship_reward_index" maps onto those levels, so the v1.7.0
+# empirically-derived table is kept as-is.
 FRIENDSHIP_BONUSES = [
     (1, 0, 0, 0), (2, 3, 0, 0), (3, 3, 1, 0), (4, 3, 1, 1), (5, 6, 1, 1),
     (6, 6, 2, 1), (7, 6, 2, 4), (8, 9, 2, 4), (9, 9, 3, 4), (10, 9, 3, 7),
